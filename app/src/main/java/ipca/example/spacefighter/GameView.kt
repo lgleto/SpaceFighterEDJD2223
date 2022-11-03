@@ -4,6 +4,7 @@ import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
+import android.media.MediaPlayer
 import android.util.AttributeSet
 import android.view.MotionEvent
 import android.view.SurfaceHolder
@@ -15,8 +16,10 @@ class GameView : SurfaceView, Runnable {
     lateinit var gameThread : Thread
 
     lateinit var player : Player
+    lateinit var boom : Boom
     var stars = arrayListOf<Star>()
     var enemies = arrayListOf<Enemy>()
+
 
     var canvas : Canvas? = null
     lateinit var paint: Paint
@@ -40,6 +43,7 @@ class GameView : SurfaceView, Runnable {
 
     fun init (context : Context?, screenWidth : Int, screenHeight:Int ) {
         player  = Player(context!!, screenWidth, screenHeight)
+        boom = Boom(context!!, screenWidth, screenHeight)
         paint = Paint()
 
         for( index in 0..99){
@@ -72,6 +76,11 @@ class GameView : SurfaceView, Runnable {
     }
 
     fun update() {
+        boom.x = -250F
+        boom.y = -250F
+
+
+
         player.update()
         for (s in stars){
             s.update(player.speed)
@@ -81,6 +90,12 @@ class GameView : SurfaceView, Runnable {
             e.update(player.speed)
 
             if (e.detectColision.intersect(player.detectColision)){
+
+                boom.x = e.x
+                boom.y = e.y
+
+                var boomSound = MediaPlayer.create(context, R.raw.boom)
+                boomSound.start()
                 e.x = -300F
             }
 
@@ -108,6 +123,8 @@ class GameView : SurfaceView, Runnable {
 
             canvas?.drawBitmap(player.bitmap, player.x, player.y, paint)
             canvas?.drawRect(player.detectColision, paint)
+
+            canvas?.drawBitmap(boom.bitmap, boom.x, boom.y, paint)
 
             holder.unlockCanvasAndPost(canvas)
         }
