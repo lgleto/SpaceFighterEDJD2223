@@ -3,6 +3,7 @@ package ipca.example.spacefighter
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.graphics.Rect
 
 class Player {
 
@@ -22,6 +23,8 @@ class Player {
         const val MIN_SPEED = 1
     }
 
+    var detectColision = Rect()
+
     constructor(context: Context, screenWidth : Int, screenHeight : Int) {
         x = 75f
         y = 50f
@@ -30,6 +33,8 @@ class Player {
 
         minY = 0f
         maxY = (screenHeight - bitmap.height).toFloat()
+
+        detectColision = Rect(x.toInt(), y.toInt(), bitmap.width, bitmap.height)
     }
 
     fun update(){
@@ -46,6 +51,11 @@ class Player {
 
         if (y < minY) y = minY
         if (y > maxY) y = maxY
+
+        detectColision.left = x.toInt()
+        detectColision.top = y.toInt()
+        detectColision.right = x.toInt() + bitmap.width
+        detectColision.bottom = y.toInt() + bitmap.height
     }
 
 

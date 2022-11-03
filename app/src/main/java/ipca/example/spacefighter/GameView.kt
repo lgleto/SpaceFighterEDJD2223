@@ -16,6 +16,7 @@ class GameView : SurfaceView, Runnable {
 
     lateinit var player : Player
     var stars = arrayListOf<Star>()
+    var enemies = arrayListOf<Enemy>()
 
     var canvas : Canvas? = null
     lateinit var paint: Paint
@@ -44,6 +45,10 @@ class GameView : SurfaceView, Runnable {
         for( index in 0..99){
             stars.add(Star(context!!, screenWidth, screenHeight))
         }
+
+        for( index in 0..2){
+            enemies.add(Enemy(context!!, screenWidth, screenHeight))
+        }
     }
 
 
@@ -71,6 +76,15 @@ class GameView : SurfaceView, Runnable {
         for (s in stars){
             s.update(player.speed)
         }
+
+        for (e in enemies){
+            e.update(player.speed)
+
+            if (e.detectColision.intersect(player.detectColision)){
+                e.x = -300F
+            }
+
+        }
     }
     fun draw() {
         if(holder.surface.isValid){
@@ -83,8 +97,17 @@ class GameView : SurfaceView, Runnable {
                 canvas?.drawPoint(s.x, s.y, paint)
             }
 
-            canvas?.drawBitmap(player.bitmap, player.x, player.y, paint)
+            paint.strokeWidth = 1.0F
+            paint.style = Paint.Style.STROKE
 
+            for (e in enemies){
+                canvas?.drawBitmap(e.bitmap, e.x, e.y, paint)
+                paint.color = Color.GREEN
+                canvas?.drawRect(e.detectColision, paint)
+            }
+
+            canvas?.drawBitmap(player.bitmap, player.x, player.y, paint)
+            canvas?.drawRect(player.detectColision, paint)
 
             holder.unlockCanvasAndPost(canvas)
         }
